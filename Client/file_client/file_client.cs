@@ -44,8 +44,7 @@ namespace tcp
 			LIB.writeTextTCP (serverStream, filePath);
 
 			long fileSize = LIB.getFileSizeTCP (serverStream);
-			while (fileSize == 0) 
-			{
+			while (fileSize == 0) {
 				Console.WriteLine ("File not found. Input a valid file");
 				Console.WriteLine ("Enter new file: ");
 				filePath = Console.ReadLine ();
