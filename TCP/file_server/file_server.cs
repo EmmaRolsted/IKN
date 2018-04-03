@@ -7,13 +7,9 @@ namespace tcp
 {
 	class file_server
 	{
-		/// <summary>
 		/// The PORT
-		/// </summary>
 		const int PORT = 9000;
-		/// <summary>
 		/// The BUFSIZE
-		/// </summary>
 		const int BUFSIZE = 1000;
 
 		/// <summary>
@@ -26,9 +22,9 @@ namespace tcp
 		/// Lukker socketen og programmet
 		/// </summary>
 		private file_server ()
-		{		
+		{		//initialiser variabler 
 			string filePath = string.Empty;
-			long fileSizeLong = 0;
+			long fileSizeLong = 0;               
 			string fileSizeStr = string.Empty;
 
 			TcpListener ServerSocket = new TcpListener (PORT);
@@ -39,13 +35,13 @@ namespace tcp
 			Console.WriteLine ("Accepted connection");
 
 			NetworkStream networkStream = ClientSocket.GetStream();
-			filePath = LIB.readTextTCP (networkStream);
+			filePath = LIB.readTextTCP (networkStream); 
 			Console.WriteLine ("The client wants " + filePath);
 
 			//Gets file size, and checks whether it exists
 			fileSizeLong = LIB.check_File_Exists (filePath);
-			fileSizeStr = fileSizeLong.ToString ();
-			LIB.writeTextTCP (networkStream, fileSizeStr);
+			fileSizeStr = fileSizeLong.ToString ();         //converts it to string
+			LIB.writeTextTCP (networkStream, fileSizeStr);  // sending the size of the file to client 
 
 			while (fileSizeLong == 0) {
 				Console.WriteLine ("Error, file does not exist");
@@ -63,8 +59,8 @@ namespace tcp
 
 			Console.WriteLine ("The size of the file is {0} bytes", fileSizeLong);
 
-			//sendFile(filename, size,
-			sendFile (filePath, fileSizeLong, networkStream);
+			sendFile (filePath, fileSizeLong, networkStream); //kalder sendFile funktionen
+
 
 			ClientSocket.Close ();
 			ServerSocket.Stop ();
@@ -84,21 +80,20 @@ namespace tcp
 		/// </param>
 		private void sendFile (String fileName, long fileSize, NetworkStream io)
 		{
+			Byte[] bufferServer = new Byte[BUFSIZE]; 
 
-			//Kan bøvle med hele stien!!
 			Console.WriteLine (fileName);
 
 			FileStream Fs = new FileStream (fileName, FileMode.Open, FileAccess.Read);
 
-			Byte[] array = new Byte[BUFSIZE]; 
-			int bytesRead = Fs.Read(array, 0, BUFSIZE);
-			io.Write (array, 0, bytesRead);
+			int bytesRead = Fs.Read(bufferServer, 0, BUFSIZE); //Der bliver læst fra fileName, puttes ind i bufferserveren og må max læse 1000 bytes(BUFSIZE)
+			io.Write (bufferServer, 0, bytesRead);
 			//Whileloop fortsætter, så længe der er bytes at sende (fra fil)
 			while(bytesRead > 0)
 			{
-				bytesRead = Fs.Read(array, 0, BUFSIZE);
-				io.Write (array, 0, bytesRead);
-				//Console.WriteLine (bytesRead);
+				bytesRead = Fs.Read(bufferServer, 0, BUFSIZE);
+				io.Write (bufferServer, 0, bytesRead);
+
 			}
 			Console.WriteLine ("File sent");
 			Fs.Close ();
