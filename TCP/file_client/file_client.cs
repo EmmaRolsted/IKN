@@ -24,6 +24,9 @@ namespace tcp
 		/// </param>
 		private file_client (string[] args)
 		{
+			string filePath = "";
+			long fileSize = 0;
+
 			TcpClient ClientSocket = new TcpClient ();
 			try
 			{
@@ -34,81 +37,29 @@ namespace tcp
 			{
 				Console.WriteLine ("No connection");
 			}
-			//Get path and name from user
-			//Console.WriteLine ("What with pathname would you like?");
-			//string path = Console.ReadLine ();
-			string filePath = args[1];
 
-			//Writes to server
 			NetworkStream serverStream = ClientSocket.GetStream();
+
+			//Saving requested file in filePath
+			filePath = args[1];
+			Console.WriteLine ("Requesting file...");
 			LIB.writeTextTCP (serverStream, filePath);
 
-			long fileSize = LIB.getFileSizeTCP (serverStream);
+			fileSize = LIB.getFileSizeTCP (serverStream);
+
 			while (fileSize == 0) {
-				Console.WriteLine ("File not found. Input a valid file");
+				Console.WriteLine ("!File not found!");
 				Console.WriteLine ("Enter new file: ");
 				filePath = Console.ReadLine ();
 
-				Console.WriteLine($"Requesting filename '{filePath}'");
-
+				Console.WriteLine ("Requesting file...");
 				LIB.writeTextTCP (serverStream, filePath);
 				fileSize = LIB.getFileSizeTCP (serverStream);
 			}
-			Console.WriteLine ("File does exist!");
-			//Calls receivefile
-			//string filename = LIB.extractFileName (path);
+			Console.WriteLine ("Receiving file...");
 			receiveFile (filePath, serverStream);
 		}
-		/*private file_client (string[] args)
-		{
-			string fileSizeStr = "";
-			long fileSizeLong = 0;
-			string filePath = string.Empty;
 
-			TcpClient ClientSocket = new TcpClient ();
-			try
-			{
-				ClientSocket.Connect("10.0.0.2", PORT);
-				Console.WriteLine("Connected to 10.0.0.2, port {0}", PORT);
-			}
-			catch
-			{
-				Console.WriteLine ("No connection");
-			}
-
-			Console.WriteLine ("What with pathname would you like?");
-			filePath = Console.ReadLine();
-
-			NetworkStream serverStream = ClientSocket.GetStream();
-			LIB.writeTextTCP (serverStream, filePath);
-			//Get path and name from user
-
-			//Console.WriteLine (filePath);
-
-			//Console.WriteLine ("Written to server");
-
-			//fileSize = LIB.getFileSizeTCP(serverStream);
-			fileSizeStr = LIB.readTextTCP(serverStream);
-			fileSizeLong = Convert.ToInt64 (fileSizeStr);
-			//fileSizeLong = int.Parse (fileSizeStr);
-			Console.WriteLine (fileSizeStr);
-
-			while(fileSizeLong == 0) {
-				Console.WriteLine ("File does not exists");
-				Console.WriteLine ("What with pathname would you like?");
-				filePath = Console.ReadLine ();
-				LIB.writeTextTCP (serverStream, filePath);
-				fileSizeStr = LIB.readTextTCP(serverStream);
-				fileSizeLong = int.Parse (fileSizeStr);
-			} 
-
-			Console.WriteLine (fileSizeLong);
-				
-			//Calls receivefile
-			//string filename = LIB.extractFileName (path);
-			receiveFile (filePath, serverStream);
-		}
-		*/
 		/// <summary>
 		/// Receives the file.
 		/// </summary>
@@ -126,26 +77,12 @@ namespace tcp
 			int bytesRead = 0;
 			byte[] buffer = new byte[BUFSIZE];
 
-			//Receive size in string 
-			//string sizeStr = LIB.readTextTCP(io);
-			//long size = Convert.ToInt64 (sizeStr);
+			//Create directory for file
+			fileDirectory = "/root/Desktop/ServerFiles/";
+			Directory.CreateDirectory (fileDirectory);
 
-			//Console.WriteLine ("Size is: {0}", size);
-
-			//Create directory
-			//fileDirectory = "/root/Desktop/";
-			//Directory.CreateDirectory (fileDirectory);
-
-			//Get filename
-			//fileName = LIB.extractFileName (filePath);
-
-			//Skal modtage hvad server sender, og whileloop, der afhænger af antal bytes der modtages 
 			fileName = LIB.extractFileName(filePath);
-			//string directory = "/root/Desktop/Files/";
-			//Directory.CreateDirectory (directory);
-
-			FileStream Fs = new FileStream (filePath, FileMode.OpenOrCreate, FileAccess.Write);
-
+			FileStream Fs = new FileStream (fileDirectory + fileName, FileMode.OpenOrCreate, FileAccess.Write);
 			Console.WriteLine ("Reading file " + fileName + "...");
 
 			do
