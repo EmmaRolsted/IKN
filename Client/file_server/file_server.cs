@@ -24,10 +24,50 @@ namespace tcp
 		/// Finder filstørrelsen
 		/// Kalder metoden sendFile
 		/// Lukker socketen og programmet
- 		/// </summary>
+		/// </summary>
 		private file_server ()
-		{
-			// TO DO Your own code
+		{		
+			string filePath = string.Empty;
+			long fileSizeLong = 0;
+			string fileSizeStr = string.Empty;
+
+			TcpListener ServerSocket = new TcpListener (PORT);
+			TcpClient ClientSocket = default(TcpClient);
+			ServerSocket.Start ();
+			Console.WriteLine("Server started");
+			ClientSocket = ServerSocket.AcceptTcpClient ();
+			Console.WriteLine ("Accepted connection");
+
+			NetworkStream networkStream = ClientSocket.GetStream();
+			filePath = LIB.readTextTCP (networkStream);
+			Console.WriteLine ("The client wants " + filePath);
+
+			//Gets file size, and checks whether it exists
+			fileSizeLong = LIB.check_File_Exists (filePath);
+			fileSizeStr = fileSizeLong.ToString ();
+			LIB.writeTextTCP (networkStream, fileSizeStr);
+
+			while (fileSizeLong == 0) {
+				Console.WriteLine ("Error, file does not exist");
+				//Writes size to client as string
+
+				filePath = LIB.readTextTCP (networkStream);
+				Console.WriteLine (filePath);
+
+				//Gets file size, and checks whether it exists
+				fileSizeLong = LIB.check_File_Exists (filePath);
+				fileSizeStr = fileSizeLong.ToString ();
+				LIB.writeTextTCP (networkStream, fileSizeStr);
+
+			}
+
+			Console.WriteLine ("The size of the file is {0} bytes", fileSizeLong);
+
+			//sendFile(filename, size,
+			sendFile (filePath, fileSizeLong, networkStream);
+
+			ClientSocket.Close ();
+			ServerSocket.Stop ();
 		}
 
 		/// <summary>
@@ -44,7 +84,24 @@ namespace tcp
 		/// </param>
 		private void sendFile (String fileName, long fileSize, NetworkStream io)
 		{
-			// TO DO Your own code
+
+			//Kan bøvle med hele stien!!
+			Console.WriteLine (fileName);
+
+			FileStream Fs = new FileStream (fileName, FileMode.Open, FileAccess.Read);
+
+			Byte[] array = new Byte[BUFSIZE]; 
+			int bytesRead = Fs.Read(array, 0, BUFSIZE);
+			io.Write (array, 0, bytesRead);
+			//Whileloop fortsætter, så længe der er bytes at sende (fra fil)
+			while(bytesRead > 0)
+			{
+				bytesRead = Fs.Read(array, 0, BUFSIZE);
+				io.Write (array, 0, bytesRead);
+				//Console.WriteLine (bytesRead);
+			}
+			Console.WriteLine ("File sent");
+			Fs.Close ();
 		}
 
 		/// <summary>
@@ -56,7 +113,9 @@ namespace tcp
 		public static void Main (string[] args)
 		{
 			Console.WriteLine ("Server starts...");
-			new file_server();
+			while (true) {
+				new file_server ();
+			}
 		}
 	}
 }
