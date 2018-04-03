@@ -1,0 +1,5 @@
+/home/ikn/IKN/UDP_Server/UDP_Server/obj/x86/Debug/.NETFramework,Version=v4.5.AssemblyAttribute.cs
+/home/ikn/IKN/UDP_Server/UDP_Server/bin/Debug/UDP_Server.exe.mdb
+/home/ikn/IKN/UDP_Server/UDP_Server/bin/Debug/UDP_Server.exe
+/home/ikn/IKN/UDP_Server/UDP_Server/obj/x86/Debug/UDP_Server.exe
+/home/ikn/IKN/UDP_Server/UDP_Server/obj/x86/Debug/UDP_Server.exe.mdb
