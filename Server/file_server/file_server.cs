@@ -56,6 +56,7 @@ namespace tcp
 
 				//Gets file size, and checks whether it exists
 				fileSizeLong = LIB.check_File_Exists (filePath);
+				fileSizeStr = fileSizeLong.ToString ();
 				LIB.writeTextTCP (networkStream, fileSizeStr);
 
 			}
