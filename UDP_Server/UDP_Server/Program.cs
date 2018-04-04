@@ -11,68 +11,51 @@ namespace UDP
 	class UDP_Server
 	{
 		const int PORT = 9000; 
+		const int BUF = 1000;
+
 
 		private UDP_Server()
 		{
-			var server = new UdpClient (PORT); 
-			// End point
-			IPEndPoint EndPoint = new IPEndPoint (IPAddress.Any, PORT); 
 
+			UdpClient listener = new UdpClient (PORT); 
+			IPEndPoint IP_Endpoint = new IPEndPoint (IPAddress.Any, PORT);
 
 			while (true) {
 			
-				// Receive from client 
-				byte[] recvData = server.Receive (ref EndPoint);
-				string data = Encoding.ASCII.GetString (recvData);
+				// Receiving bytes and saving IP
+				byte[] recv_byte = listener.Receive (ref IP_Endpoint); 
+				string recv_data = Encoding.ASCII.GetString (recv_byte, 0, recv_byte.Length);
 
+				Console.WriteLine ("Received: {0}", recv_data); 
 
-				Console.WriteLine ("Received from client: " + data); 
+				if (recv_data.ToLower () != "l" && recv_data.ToLower () != "u") {
+					string errorMsg = "Wrong Char";
+					listener.Send (Encoding.ASCII.GetBytes(errorMsg), errorMsg.Length, IP_Endpoint);
+				}
+				else if (recv_data.ToLower () == "l") {
+					// Reading
+					string loadavg = System.IO.File.ReadAllText (@"/proc/loadavg"); 
+					Console.WriteLine ("Sender loadavg...");
+					// Sending
+					listener.Send (Encoding.ASCII.GetBytes (loadavg), loadavg.Length, IP_Endpoint); 
+				} 
+				else if (recv_data.ToLower () == "u") {
+					// Reading
+					string uptime = System.IO.File.ReadAllText (@"/proc/uptime");
+					Console.WriteLine ("Sender uptime..."); 
+					// Sending
+					listener.Send (Encoding.ASCII.GetBytes (uptime), uptime.Length, IP_Endpoint);
+				}
 
-
-				// Get info to client 
-				string m = GetMeasurement (data);
-
-
-				// Send back 
-				byte[] ReturnData = Encoding.ASCII.GetBytes (m); 
-				server.Send (ReturnData, ReturnData.Length, EndPoint); 
-
+			
 			}
+				
 		}
-
-
-		public string GetMeasurement(string client_letter){
-
-			string Path; 
-
-			switch (client_letter = client_letter.ToUpper())
-			{
-
-			case "L":
-				Path = "/proc/loadavg"; 
-				Console.WriteLine ("Loadavg"); 
-				break; 
-			case "U": 
-				Path = "/proc/uptime"; 
-				Console.WriteLine ("Uptime"); 
-				break; 
-			default: 
-				Console.WriteLine ("Error");
-				return "Unvalid input. Valid inputs: l or u\n"; 
-
-			}
-			return "Reading" + Path + File.ReadAllText (Path);
-
-		}
-
 
 		static void Main (string[] args)
 		{
-			while (true) {
-				Console.WriteLine ("Server starting"); 
+				Console.WriteLine ("Server starts..."); 
 				new UDP_Server ();
-			}
-			
 		}
 	}
 }
