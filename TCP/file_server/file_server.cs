@@ -45,8 +45,6 @@ namespace tcp
 
 			while (fileSizeLong == 0) {
 				Console.WriteLine ("Error, file does not exist");
-				//Writes size to client as string
-
 				filePath = LIB.readTextTCP (networkStream);
 				Console.WriteLine (filePath);
 
@@ -54,13 +52,10 @@ namespace tcp
 				fileSizeLong = LIB.check_File_Exists (filePath);
 				fileSizeStr = fileSizeLong.ToString ();
 				LIB.writeTextTCP (networkStream, fileSizeStr);
-
 			}
 
 			Console.WriteLine ("The size of the file is {0} bytes", fileSizeLong);
-
 			sendFile (filePath, fileSizeLong, networkStream); //kalder sendFile funktionen
-
 
 			ClientSocket.Close ();
 			ServerSocket.Stop ();
