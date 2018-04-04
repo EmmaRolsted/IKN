@@ -1,1 +1,12 @@
-﻿<Properties StartupItem="UDP/UDP.csproj" />
+﻿<Properties StartupItem="UDP/UDP.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="UDP/Program.cs">
+    <Files>
+      <File FileName="UDP/Program.cs" Line="46" Column="2" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

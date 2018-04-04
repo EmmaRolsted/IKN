@@ -7,56 +7,38 @@ namespace UDP
 {
 	class UDP_Client
 	{
+		
 		const int PORT = 9000; 
+		const int BUF = 1000; 
+
 
 		private UDP_Client(string[] args) {
-		
-			if (args.Length != 2) {
-				Console.WriteLine ("Error"); 
-				Environment.Exit (1);
-			}
+
+			string ip = args[0]; 
+			string string_send = args[1]; 
+
+			Socket socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp); 
+			IPAddress address = IPAddress.Parse (ip); 
+			IPEndPoint endPoint = new IPEndPoint (address, PORT); 
 
 
-			Socket socket = new Socket (AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+			// Sending via socket
+			byte[] send_buffer = Encoding.ASCII.GetBytes (string_send); 
+			socket.SendTo (send_buffer, endPoint); 
 
-			// New UDP client 
-			var client = new UdpClient();
 
-			//  Connect
-			IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(args[0]), PORT);
-			client.Connect(endPoint); 
-
-			// Request to server
-			byte[] sData = Encoding.ASCII.GetBytes(args[1]);
-			client.Send (sData, sData.Length);
-
-			// Receive from server 
-			//byte[] recvData = client.Receive(ref endPoint); 
-			//string data = Encoding.ASCII.GetString (recvData).ToLower(); 
-			//Console.WriteLine (data);
-
-			recvData (socket);
-
+			// Receiving 
+			byte[] recvdata = new byte[BUF]; 
+			socket.Receive (recvdata); 
+			Console.WriteLine ("Received input: {0}", Encoding.ASCII.GetString (recvdata));
 
 		}
 
-		private void recvData(Socket socket) {
-		
-			Byte[] recvBytes = new byte[1000];
-			socket.Receive (recvBytes); 
-			string data = Encoding.ASCII.GetString (recvBytes).ToLower ();
-			Console.WriteLine (data);
-		
-		
-		}
-
-
-			
 
 		public static void Main (string[] args)
 		{
 
-			Console.WriteLine ("Client starting"); 
+			Console.WriteLine ("Client starts..."); 
 			new UDP_Client (args);
 		
 		}
